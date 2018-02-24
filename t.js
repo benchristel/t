@@ -37,9 +37,9 @@ function DefaultFailureFormatter() {
     return [
       `${subject}: ${description} FAILED`,
       'expected',
-      indent(JSON.stringify(actual, null, 2)),
+      indent(prettify(actual)),
       predicateName(predicate),
-      ...(expected === undefined ? [] : [indent(JSON.stringify(expected, null, 2))])
+      ...(expected === undefined ? [] : [indent(prettify(expected))])
     ].join('\n')
   }
 
@@ -48,6 +48,14 @@ function DefaultFailureFormatter() {
       .split('\n')
       .map(line => '  ' + line)
       .join('\n')
+  }
+
+  function prettify(value) {
+    if (value) {
+      return JSON.stringify(value, null, 2)
+    } else {
+      return '' + value
+    }
   }
 }
 

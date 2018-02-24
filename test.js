@@ -44,46 +44,59 @@ t.subj = 'DefaultFailureFormatter'
   t.desc = 'outputs actual, expected, and predicate'
   expect(
     formatter.format('subject', 'description', 1, eq, 2),
-    eq,
-`subject: description FAILED
-expected
-  1
-to equal
-  2`)
+    eq, [
+      'subject: description FAILED',
+      'expected',
+      '  1',
+      'to equal',
+      '  2'
+    ].join('\n'))
 
   expect(
-    formatter.format('subject 2', 'description 2', 3, not(eq), 4),
-    eq,
-`subject 2: description 2 FAILED
-expected
-  3
-not to equal
-  4`)
+    formatter.format('subject 2', 'description 2', 3, not(eq), 3),
+    eq, [
+      'subject 2: description 2 FAILED',
+      'expected',
+      '  3',
+      'not to equal',
+      '  3'
+    ].join('\n'))
 
   t.desc = 'pretty-prints JSONable objects'
   expect(
-    formatter.format('s', 'd', {a: 1, b: 2}, eq, [1, 2, 3]),
-    eq,
-`s: d FAILED
-expected
-  {
-    "a": 1,
-    "b": 2
-  }
-to equal
-  [
-    1,
-    2,
-    3
-  ]`
-  )
+    formatter.format('subj', 'desc', {a: 1, b: 2}, eq, [1, 2, 3]),
+    eq, [
+      'subj: desc FAILED',
+      'expected',
+      '  {',
+      '    "a": 1,',
+      '    "b": 2',
+      '  }',
+      'to equal',
+      '  [',
+      '    1,',
+      '    2,',
+      '    3',
+      '  ]'
+    ].join('\n'))
 
-  t.desc = 'does not print the expected value if it is not defined'
+  t.desc = 'undefined expected value'
   expect(
     formatter.format('subj', 'desc', 1, defined, undefined),
-    eq,
-`subj: desc FAILED
-expected
-  1
-to be defined`)
+    eq, [
+      'subj: desc FAILED',
+      'expected',
+      '  1',
+      'to be defined'
+    ].join('\n'))
+
+  t.desc = 'undefined actual value'
+  expect(
+    formatter.format('subj', 'desc', undefined, defined, undefined),
+    eq, [
+      'subj: desc FAILED',
+      'expected',
+      '  undefined',
+      'to be defined'
+    ].join('\n'))
 }
