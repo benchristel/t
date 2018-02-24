@@ -1,4 +1,4 @@
-const {t, expect, eq, not} = require('./t')
+const {t, expect, eq, not, defined} = require('./t')
 
 t.subj = 'a test'
 {
@@ -25,6 +25,16 @@ t.subj = 'eq'
   expect({a: 2}, not(eq), {a: 1})
   expect({a: {b: 1}}, not(eq), {a: {b: 1, c: 2}})
   expect({a: {b: 1, c: 2}}, not(eq), {a: {b: 1}})
+}
+
+t.subj = 'defined'
+{
+  t.desc = 'given undefined'
+  expect(undefined, not(defined))
+  t.desc = 'given a falsey value'
+  expect(0, defined)
+  t.desc = 'given a truthy value'
+  expect(1, defined)
 }
 
 t.subj = 'DefaultFailureFormatter'
@@ -67,4 +77,13 @@ to equal
     3
   ]`
   )
+
+  t.desc = 'does not print the expected value if it is not defined'
+  expect(
+    formatter.format('subj', 'desc', 1, defined, undefined),
+    eq,
+`subj: desc FAILED
+expected
+  1
+to be defined`)
 }

@@ -39,7 +39,7 @@ function DefaultFailureFormatter() {
       'expected',
       indent(JSON.stringify(actual, null, 2)),
       predicateName(predicate),
-      indent(JSON.stringify(expected, null, 2))
+      ...(expected === undefined ? [] : [indent(JSON.stringify(expected, null, 2))])
     ].join('\n')
   }
 
@@ -95,6 +95,11 @@ function not(predicate) {
   return negated
 }
 
+function defined(actual) {
+  defined.displayName = 'to be defined'
+  return actual !== undefined
+}
+
 function predicateName(predicate) {
   return predicate.displayName
     ? predicate.displayName
@@ -102,5 +107,5 @@ function predicateName(predicate) {
 }
 
 if (typeof module === 'object') {
-  module.exports = {t, expect, eq, not}
+  module.exports = {t, expect, eq, not, defined}
 }
