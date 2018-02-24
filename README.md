@@ -15,7 +15,7 @@ expect(first(1, [5]), eq, [5])
 ## API
 
 - `t.subj`: Your tests should set this property to a description of the item under test. Printed in test results.
-- `t.case`: Your tests should set this property to a description of the test case. Printed in test results.
+- `t.desc`: Your tests should set this property to a description of the test case. Printed in test results.
 - `expect(actual, predicate, expected)`: Assert that the predicate function returns true when called like this: `predicate(actual, expected)`. If the predicate function has a property `displayName`, it will be printed in test failures. Otherwise, the `name` of the predicate will be printed.
 
 Several predicates for use with `expect` are included. These are:
