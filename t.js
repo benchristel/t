@@ -4,19 +4,51 @@ const t = {
   DefaultFailureFormatter
 }
 
-function NodeJsReporter(failureFormatter) {
+function NodeJsReporter(failureFormatter, log=console.log) {
+  let numPassed = 0
+  let numFailed = 0
+
   return {
     passed,
-    failed
+    failed,
+    finished
   }
 
   function passed() {
-    process.stdout.write(green('.'))
+    numPassed++
   }
 
   function failed(subj, desc, actual, predicate, expected) {
-    console.error('')
-    console.error(red(failureFormatter.format(subj, desc, actual, predicate, expected)))
+    numFailed++
+    log(red('----------------------------------------'))
+    log(red(failureFormatter.format(subj, desc, actual, predicate, expected)))
+  }
+
+  function finished() {
+    if (numFailed === 0) {
+      log(successMessage())
+    } else {
+      log(red('\n========================================'))
+      log(failureMessage())
+      return 'SUITE_FAILED'
+    }
+  }
+
+  function successMessage() {
+    switch (numPassed) {
+      case 0:
+        return 'No tests found'
+      case 1:
+        return green('One test passed')
+      default:
+        return green('All ' + numPassed + ' tests passed')
+    }
+  }
+
+  function failureMessage() {
+    return numFailed === 1 ?
+      red('One test failed') :
+      red('' + numFailed + ' tests failed')
   }
 
   function red(text) {
@@ -64,6 +96,14 @@ function expect(actual, predicate, expected) {
     t.reporter.passed()
   } else {
     t.reporter.failed(t.subj, t.desc, actual, predicate, expected)
+    t.suiteFailed = true
+  }
+  if (!t.suiteEndTimeout) {
+    t.suiteEndTimeout = setTimeout(function() {
+      if (t.reporter.finished() === 'SUITE_FAILED') {
+        process.exit(1)
+      }
+    }, 1)
   }
 }
 

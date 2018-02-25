@@ -1,11 +1,13 @@
 const {t, expect, eq, not, defined} = require('./t')
 
+// =========================================================
 t.subj = 'a test'
 {
   t.desc = 'passes'
   expect(1, eq, 1)
 }
 
+// =========================================================
 t.subj = 'eq'
 {
   t.desc = 'empty arrays are equal'
@@ -27,6 +29,7 @@ t.subj = 'eq'
   expect({a: {b: 1, c: 2}}, not(eq), {a: {b: 1}})
 }
 
+// =========================================================
 t.subj = 'defined'
 {
   t.desc = 'given undefined'
@@ -37,6 +40,7 @@ t.subj = 'defined'
   expect(1, defined)
 }
 
+// =========================================================
 t.subj = 'DefaultFailureFormatter'
 {
   let formatter = t.DefaultFailureFormatter()
@@ -99,4 +103,79 @@ t.subj = 'DefaultFailureFormatter'
       '  undefined',
       'to be defined'
     ].join('\n'))
+}
+
+// =========================================================
+t.subj = 'NodeJsReporter'
+{
+  let nullFormatter = {format() {return 'fail'}}
+  let log = function(...args) {
+    log.calls.push(args)
+  }
+  log.calls = []
+  let reporter
+
+  t.desc = 'logs when no tests ran'
+  reporter = t.NodeJsReporter(nullFormatter, log)
+  reporter.finished()
+  expect(log.calls, eq, [['No tests found']])
+  log.calls.length = 0
+
+  t.desc = 'logs a single passing test'
+  reporter = t.NodeJsReporter(nullFormatter, log)
+  reporter.passed()
+  reporter.finished()
+  expect(log.calls, eq, [['\u001b[32mOne test passed\u001b[0m']])
+  log.calls.length = 0
+
+  t.desc = 'logs 2 passing tests'
+  reporter = t.NodeJsReporter(nullFormatter, log)
+  reporter.passed()
+  reporter.passed()
+  reporter.finished()
+  expect(log.calls, eq, [['\u001b[32mAll 2 tests passed\u001b[0m']])
+  log.calls.length = 0
+
+  t.desc = 'logs a failure'
+  reporter = t.NodeJsReporter(nullFormatter, log)
+  reporter.failed()
+  reporter.finished()
+  expect(log.calls, eq, [
+    ['\u001b[31m----------------------------------------\u001b[0m'],
+    ['\u001b[31mfail\u001b[0m'],
+    ['\u001b[31m\n========================================\u001b[0m'],
+    ['\u001b[31mOne test failed\u001b[0m'],
+  ])
+  log.calls.length = 0
+
+  t.desc = 'logs 2 failures'
+  reporter = t.NodeJsReporter(nullFormatter, log)
+  reporter.failed()
+  reporter.failed()
+  reporter.finished()
+  expect(log.calls, eq, [
+    ['\u001b[31m----------------------------------------\u001b[0m'],
+    ['\u001b[31mfail\u001b[0m'],
+    ['\u001b[31m----------------------------------------\u001b[0m'],
+    ['\u001b[31mfail\u001b[0m'],
+    ['\u001b[31m\n========================================\u001b[0m'],
+    ['\u001b[31m2 tests failed\u001b[0m'],
+  ])
+  log.calls.length = 0
+
+  t.desc = 'logs failures when some tests passed'
+  reporter = t.NodeJsReporter(nullFormatter, log)
+  reporter.failed()
+  reporter.failed()
+  reporter.passed()
+  reporter.finished()
+  expect(log.calls, eq, [
+    ['\u001b[31m----------------------------------------\u001b[0m'],
+    ['\u001b[31mfail\u001b[0m'],
+    ['\u001b[31m----------------------------------------\u001b[0m'],
+    ['\u001b[31mfail\u001b[0m'],
+    ['\u001b[31m\n========================================\u001b[0m'],
+    ['\u001b[31m2 tests failed\u001b[0m'],
+  ])
+  log.calls.length = 0
 }
