@@ -103,6 +103,16 @@ t.subj = 'DefaultFailureFormatter'
       '  undefined',
       'to be defined'
     ].join('\n'))
+
+  t.desc = 'negated predicate'
+  expect(
+    formatter.format('subj', 'desc', 1, not(defined)),
+    eq, [
+      'subj: desc FAILED',
+      'expected',
+      '  1',
+      'not to be defined'
+    ].join('\n'))
 }
 
 // =========================================================

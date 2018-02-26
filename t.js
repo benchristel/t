@@ -108,8 +108,6 @@ function expect(actual, predicate, expected) {
 }
 
 function eq(a, b) {
-  eq.displayName = 'to equal'
-
   if (a instanceof Array) {
     if (!(b instanceof Array)) {
       return false
@@ -134,19 +132,21 @@ function eq(a, b) {
 
   return a === b
 }
+eq.displayName = 'to equal'
 
 function not(predicate) {
   let negated = function(...args) {
-    return !predicate(...args)
+    result = !predicate(...args)
+    return result
   }
   negated.displayName = 'not ' + predicateName(predicate)
   return negated
 }
 
 function defined(actual) {
-  defined.displayName = 'to be defined'
   return actual !== undefined
 }
+defined.displayName = 'to be defined'
 
 function predicateName(predicate) {
   return predicate.displayName
